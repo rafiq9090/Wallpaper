@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blac_shade_1"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/shape"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+<!--        <EditText-->
+<!--            android:id="@+id/idEdtSearch"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="3.5"-->
+<!--            android:backgroundTint="@android:color/transparent"-->
+<!--            android:hint="Search Wallpaper"-->
+<!--            android:padding="8dp"-->
+<!--            android:inputType="text"-->
+<!--            android:imeActionId="666"-->
+<!--            android:imeOptions="actionGo"-->
+<!--            android:singleLine="true"-->
+<!--            android:textColor="#8BFFFFFF"-->
+<!--            android:textSize="15sp"-->
+<!--            tools:ignore="Suspicious0dp" />-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/idIVSearch"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:layout_weight="0.5"-->
+<!--            android:padding="4dp"-->
+<!--            android:src="@drawable/ic_search"-->
+<!--            tools:ignore="Suspicious0dp" />-->
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchID"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:focusable="false"
+            android:inputType="text"
+            android:imeOptions="actionGo"
+            app:queryHint="Search Wallpaper"
+            android:backgroundTint="@color/black"
+            app:iconifiedByDefault="false"
+
+            />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/idRVCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main"
+        android:layout_marginTop="3dp"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/idRVWallpaper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/idRVCategory"
+        android:layout_marginTop="5dp" />
+
+    <ProgressBar
+        android:id="@+id/idPBLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>
