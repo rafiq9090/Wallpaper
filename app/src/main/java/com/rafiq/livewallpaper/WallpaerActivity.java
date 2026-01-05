@@ -1,4 +1,4 @@
-package com.example.wallpaper;
+package com.rafiq.livewallpaper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +42,7 @@ public class WallpaerActivity extends AppCompatActivity {
     private String imgUrl;
     private String videoUrl;
     private boolean isVideo;
+    private boolean isLocal;
     private WallpaperManager wallpaperManager;
 
     @Override
@@ -60,6 +61,7 @@ public class WallpaerActivity extends AppCompatActivity {
 
         imgUrl = getIntent().getStringExtra("imageUrl");
         isVideo = getIntent().getBooleanExtra("isVideo", false);
+        isLocal = getIntent().getBooleanExtra("isLocal", false);
         videoUrl = getIntent().getStringExtra("videoUrl");
 
         if (isVideo) {
@@ -116,10 +118,30 @@ public class WallpaerActivity extends AppCompatActivity {
     }
 
     private void setStaticWallpaper() {
+        // Show options: Home, Lock, Both
+        String[] options = { "Home Screen", "Lock Screen", "Both Screens" };
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setTitle("Set Wallpaper");
+        builder.setItems(options, (dialog, which) -> {
+            int flags = 0;
+            if (which == 0) {
+                flags = WallpaperManager.FLAG_SYSTEM;
+            } else if (which == 1) {
+                flags = WallpaperManager.FLAG_LOCK;
+            } else if (which == 2) {
+                flags = WallpaperManager.FLAG_SYSTEM | WallpaperManager.FLAG_LOCK;
+            }
+
+            downloadAndSetWallpaper(flags);
+        });
+        builder.show();
+    }
+
+    private void downloadAndSetWallpaper(int flags) {
         progressBar.setVisibility(View.VISIBLE);
-        Glide.with(WallpaerActivity.this).asBitmap().load(imgUrl).listener(new RequestListener<Bitmap>() {
+        Glide.with(WallpaerActivity.this).asFile().load(imgUrl).listener(new RequestListener<File>() {
             @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target,
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<File> target,
                     boolean isFirstResource) {
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(WallpaerActivity.this, "Fail to load image..", Toast.LENGTH_SHORT).show();
@@ -127,11 +149,21 @@ public class WallpaerActivity extends AppCompatActivity {
             }
 
             @Override
-            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource,
+            public boolean onResourceReady(File resource, Object model, Target<File> target, DataSource dataSource,
                     boolean isFirstResource) {
                 try {
-                    wallpaperManager.setBitmap(resource);
-                    FancyToast.makeText(WallpaerActivity.this, "Wallpaper set to home screen.", FancyToast.LENGTH_SHORT,
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        try (FileInputStream fis = new FileInputStream(resource)) {
+                            wallpaperManager.setStream(fis, null, true, flags);
+                        }
+                    } else {
+                        // Fallback for older devices (only sets System/Home usually)
+                        try (FileInputStream fis = new FileInputStream(resource)) {
+                            wallpaperManager.setStream(fis);
+                        }
+                    }
+
+                    FancyToast.makeText(WallpaerActivity.this, "Wallpaper set successfully!", FancyToast.LENGTH_SHORT,
                             FancyToast.SUCCESS, false).show();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -153,16 +185,22 @@ public class WallpaerActivity extends AppCompatActivity {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                // Use Glide to download file to cache
-                File file = Glide.with(getApplicationContext())
-                        .asFile()
-                        .load(videoUrl)
-                        .submit()
-                        .get();
-
-                // Copy to internal files dir
                 File destFile = new File(getFilesDir(), "live_wallpaper.mp4");
-                copyFile(file, destFile);
+
+                if (isLocal) {
+                    // Copy from Content URI
+                    InputStream inputStream = getContentResolver().openInputStream(Uri.parse(videoUrl));
+                    copyStreamToFile(inputStream, destFile);
+                } else {
+                    // Use Glide to download file to cache
+                    File file = Glide.with(getApplicationContext())
+                            .asFile()
+                            .load(videoUrl)
+                            .submit()
+                            .get();
+                    // Copy to internal files dir
+                    copyFile(file, destFile);
+                }
 
                 // Save path
                 SharedPreferences prefs = getSharedPreferences("WALLPAPER_PREFS", MODE_PRIVATE);
@@ -209,6 +247,19 @@ public class WallpaerActivity extends AppCompatActivity {
             while ((length = is.read(buffer)) > 0) {
                 os.write(buffer, 0, length);
             }
+        }
+    }
+
+    private void copyStreamToFile(InputStream in, File dest) throws IOException {
+        try (OutputStream out = new FileOutputStream(dest)) {
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+        } finally {
+            if (in != null)
+                in.close();
         }
     }
 }

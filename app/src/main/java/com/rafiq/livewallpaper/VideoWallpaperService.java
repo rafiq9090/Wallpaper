@@ -1,4 +1,4 @@
-package com.example.wallpaper;
+package com.rafiq.livewallpaper;
 
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;
@@ -17,7 +17,7 @@ import java.io.IOException;
 
 public class VideoWallpaperService extends WallpaperService {
 
-    public static final String VIDEO_PARAMS_CONTROL_ACTION = "com.example.wallpaper.VIDEO_PARAMS_CONTROL_ACTION";
+    public static final String VIDEO_PARAMS_CONTROL_ACTION = "com.rafiq.livewallpaper.VIDEO_PARAMS_CONTROL_ACTION";
     public static final String KEY_ACTION = "action";
     public static final int ACTION_UPDATE_VIDEO = 1;
 
