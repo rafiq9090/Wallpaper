@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.wallpaper'
+    namespace 'com.rafiq.livewallpaper'
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.example.wallpaper"
+        applicationId "com.rafiq.livewallpaper"
         minSdk 21
         targetSdk 32
         versionCode 1
@@ -18,7 +18,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -41,4 +41,5 @@ dependencies {
     implementation 'com.android.volley:volley:1.2.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.github.Shashank02051997:FancyToast-Android:0.1.8'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 }

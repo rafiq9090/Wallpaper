@@ -1,4 +1,4 @@
-package com.example.wallpaper;
+package com.rafiq.livewallpaper;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -48,7 +48,7 @@ public class WallpaperRVAdapter extends RecyclerView.Adapter<WallpaperRVAdapter.
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(context, WallpaerActivity.class);
-                i.putExtra("imageUrl", model.getImageUrl());
+                i.putExtra("imageUrl", model.getHighResUrl());
                 i.putExtra("isVideo", model.isVideo());
                 if (model.isVideo()) {
                     i.putExtra("videoUrl", model.getVideoUrl());

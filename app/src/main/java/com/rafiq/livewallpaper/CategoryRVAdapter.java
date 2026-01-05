@@ -1,4 +1,4 @@
-package com.example.wallpaper;
+package com.rafiq.livewallpaper;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,7 +21,8 @@ public class CategoryRVAdapter extends RecyclerView.Adapter<CategoryRVAdapter.Vi
     private Context context;
     private CategoryOnclickInterface categoryOnclickInterface;
 
-    public CategoryRVAdapter(ArrayList<CategoryRVModel> categoryRVModelArrayList, Context context, CategoryOnclickInterface categoryOnclickInterface) {
+    public CategoryRVAdapter(ArrayList<CategoryRVModel> categoryRVModelArrayList, Context context,
+            CategoryOnclickInterface categoryOnclickInterface) {
         this.categoryRVModelArrayList = categoryRVModelArrayList;
         this.context = context;
         this.categoryOnclickInterface = categoryOnclickInterface;
@@ -30,12 +31,13 @@ public class CategoryRVAdapter extends RecyclerView.Adapter<CategoryRVAdapter.Vi
     @NonNull
     @Override
     public CategoryRVAdapter.ViewHoder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.category_rv_item,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.category_rv_item, parent, false);
         return new CategoryRVAdapter.ViewHoder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryRVAdapter.ViewHoder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(@NonNull CategoryRVAdapter.ViewHoder holder,
+            @SuppressLint("RecyclerView") int position) {
         CategoryRVModel categoryRVModel = categoryRVModelArrayList.get(position);
         holder.categoryTV.setText(categoryRVModel.getCategory());
         Glide.with(context).load(categoryRVModel.getCategoryIVUrl()).into(holder.categoryIV);
@@ -64,7 +66,8 @@ public class CategoryRVAdapter extends RecyclerView.Adapter<CategoryRVAdapter.Vi
             categoryIV = itemView.findViewById(R.id.idIVCategory);
         }
     }
-    public interface CategoryOnclickInterface{
+
+    public interface CategoryOnclickInterface {
         void onCategoryClick(int position);
     }
 }

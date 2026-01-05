@@ -1,4 +1,4 @@
-package com.example.wallpaper;
+package com.rafiq.livewallpaper;
 
 public class CategoryRVModel {
     private String category;

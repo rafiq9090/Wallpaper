@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#111"
+    tools:context=".StudioActivity">
+
+    <!-- Main Canvas Area -->
+    <FrameLayout
+        android:id="@+id/previewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/studioPreviewIV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="#121212"
+            android:contentDescription="Wallpaper Preview"/>
+
+        <!-- Grid Overlay (3x3) -->
+        <com.rafiq.livewallpaper.DrawingView
+            android:id="@+id/drawingView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/gridOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="3"
+            android:visibility="gone">
+            <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/grid_line_bg"/>
+            <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/grid_line_bg"/>
+            <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/grid_line_bg"/>
+        </LinearLayout>
+
+        <!-- Interactive Text Wrapper -->
+        <TextView
+            android:id="@+id/studioTextTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Tap to Edit"
+            android:textColor="@color/white"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:shadowColor="#80000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <ProgressBar
+            android:id="@+id/studioLoadingPB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/accent_main"
+            android:visibility="gone"/>
+
+    </FrameLayout>
+
+    <!-- Right Toolbar (Glassmorphism style) -->
+    <LinearLayout
+        android:id="@+id/rightToolbar"
+        android:layout_width="72dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:background="#00000000"
+        android:paddingTop="32dp"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/toolBg"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:padding="8dp"
+            android:layout_marginBottom="24dp"
+            app:tint="@color/white"
+            android:contentDescription="Background"/>
+
+        <ImageView
+            android:id="@+id/toolText"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="@color/white"
+            android:padding="8dp"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="Text"/>
+
+        <ImageView
+            android:id="@+id/toolFont"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_sort_alphabetically"
+            app:tint="@color/white"
+            android:padding="8dp"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="Fonts"/>
+
+        <ImageView
+            android:id="@+id/toolColor"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_view"
+            app:tint="@color/white"
+            android:padding="8dp"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="Color"/>
+
+        <ImageView
+            android:id="@+id/toolDraw"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="@color/white"
+            android:padding="8dp"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="Draw"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:src="@android:drawable/ic_menu_save"
+            app:backgroundTint="@color/purple_500"
+            app:tint="@color/white"
+            app:fabSize="mini"/>
+
+    </LinearLayout>
+
+    <!-- Overlay Panels -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/controlPanel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="@color/bg_translucent"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rightToolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/panelContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/panelTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Studio Tools"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Draw Tools -->
+            <LinearLayout
+                android:id="@+id/layoutDrawTools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView android:text="Brush Color" android:textColor="#CCC" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="4dp"/>
+                <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:scrollbars="none">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal">
+                        <View android:id="@+id/drawBlack" android:layout_width="32dp" android:layout_height="32dp" android:background="#000000" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/drawWhite" android:layout_width="32dp" android:layout_height="32dp" android:background="#FFFFFF" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/drawRed" android:layout_width="32dp" android:layout_height="32dp" android:background="#F44336" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/drawGreen" android:layout_width="32dp" android:layout_height="32dp" android:background="#4CAF50" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/drawBlue" android:layout_width="32dp" android:layout_height="32dp" android:background="#2196F3" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/drawYellow" android:layout_width="32dp" android:layout_height="32dp" android:background="#FFEB3B" android:layout_marginEnd="8dp"/>
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    <TextView android:text="Brush Size" android:textColor="#CCC" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="8dp"/>
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/sliderBrushSize"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:valueFrom="1.0"
+                        android:valueTo="50.0"
+                        android:value="10.0"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEraser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Eraser"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_marginEnd="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClearDraw"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Clear All"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                </LinearLayout>
+            </LinearLayout>
+                android:textColor="@color/accent_main"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Background Options -->
+            <LinearLayout
+                android:id="@+id/layoutBackgroundTools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:text="Generated Art"
+                    android:textColor="#888"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true">
+                        <com.google.android.material.chip.Chip android:id="@+id/chipTypeGradient" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Gradient" android:checkable="true" android:checked="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                        <com.google.android.material.chip.Chip android:id="@+id/chipTypeAbstract" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Abstract" android:checkable="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                        <com.google.android.material.chip.Chip android:id="@+id/chipTypeCyberpunk" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cyberpunk" android:checkable="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                         <com.google.android.material.chip.Chip android:id="@+id/chipTypeNature" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nature" android:checkable="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                    </com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGenerateBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Generate Art"
+                    android:layout_marginTop="4dp"
+                    app:backgroundTint="@color/accent_main"/>
+
+                <!-- Manual Background Color -->
+                <TextView
+                    android:text="Solid Colors"
+                    android:textColor="#888"
+                    android:textSize="12sp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <View android:id="@+id/bgBlack" android:layout_width="32dp" android:layout_height="32dp" android:background="#000000" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgWhite" android:layout_width="32dp" android:layout_height="32dp" android:background="#FFFFFF" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgGray" android:layout_width="32dp" android:layout_height="32dp" android:background="#9E9E9E" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgBlue" android:layout_width="32dp" android:layout_height="32dp" android:background="#2196F3" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgTeal" android:layout_width="32dp" android:layout_height="32dp" android:background="#009688" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgGreen" android:layout_width="32dp" android:layout_height="32dp" android:background="#4CAF50" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgLime" android:layout_width="32dp" android:layout_height="32dp" android:background="#CDDC39" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgYellow" android:layout_width="32dp" android:layout_height="32dp" android:background="#FFEB3B" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgAmber" android:layout_width="32dp" android:layout_height="32dp" android:background="#FFC107" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgOrange" android:layout_width="32dp" android:layout_height="32dp" android:background="#FF5722" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgRed" android:layout_width="32dp" android:layout_height="32dp" android:background="#F44336" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgPink" android:layout_width="32dp" android:layout_height="32dp" android:background="#E91E63" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/bgPurple" android:layout_width="32dp" android:layout_height="32dp" android:background="#9C27B0" android:layout_marginEnd="8dp"/>
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Gradients -->
+                <TextView
+                    android:text="Gradients"
+                    android:textColor="#888"
+                    android:textSize="12sp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <View android:id="@+id/grad1" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/grad2" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/grad3" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/grad4" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/grad5" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginEnd="8dp"/>
+                        <View android:id="@+id/grad6" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginEnd="8dp"/>
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+            <!-- Text Edit Tools -->
+            <LinearLayout
+                android:id="@+id/layoutTextTools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="+ Add New Text"
+                    app:icon="@android:drawable/ic_input_add"
+                    app:iconGravity="textStart"
+                    android:layout_marginBottom="12dp"
+                    app:backgroundTint="#33FFFFFF"
+                    app:cornerRadius="8dp"/>
+
+                <EditText
+                    android:id="@+id/etStudioText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Type Content..."
+                    android:textColor="@color/white"
+                    android:textColorHint="#888"
+                    android:background="@null"
+                    android:padding="12dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cbBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bold"
+                        android:textColor="@color/white"/>
+
+                    <View android:layout_width="16dp" android:layout_height="0dp"/>
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cbItalic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Underline"
+                        android:textColor="@color/white"/>
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeleteText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delete Text"
+                    android:textColor="#F44336"
+                    app:icon="@android:drawable/ic_menu_delete"
+                    app:iconTint="#F44336"
+                    app:iconGravity="textStart"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="12dp"
+                    app:backgroundTint="#33FFFFFF"
+                    app:cornerRadius="8dp"/>
+
+                <TextView
+                    android:text="Rotate Text"
+                    android:textColor="#888"
+                    android:textSize="12sp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/sliderRotate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="0"
+                    android:valueTo="360"
+                    android:value="0"
+                    android:stepSize="5"/>
+            </LinearLayout>
+
+             <!-- Font Tools -->
+            <LinearLayout
+                android:id="@+id/layoutFontTools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+                 <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupFont"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true">
+                        <com.google.android.material.chip.Chip android:id="@+id/fontModern" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Modern" android:checkable="true" android:checked="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                        <com.google.android.material.chip.Chip android:id="@+id/fontSerif" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Elegant (Serif)" android:checkable="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                        <com.google.android.material.chip.Chip android:id="@+id/fontMono" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Code (Mono)" android:checkable="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                        <com.google.android.material.chip.Chip android:id="@+id/fontCursive" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Handwritten" android:checkable="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                        <com.google.android.material.chip.Chip android:id="@+id/fontNeon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Neon" android:checkable="true" style="@style/Widget.MaterialComponents.Chip.Choice"/>
+                    </com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <!-- Color Palette Tools -->
+            <LinearLayout
+                android:id="@+id/layoutColorTools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <!-- Preset Colors -->
+                        <View android:id="@+id/colorWhite" android:layout_width="40dp" android:layout_height="40dp" android:background="#FFFFFF" android:layout_margin="8dp"/>
+                        <View android:id="@+id/colorYellow" android:layout_width="40dp" android:layout_height="40dp" android:background="#FFEB3B" android:layout_margin="8dp"/>
+                        <View android:id="@+id/colorCyan" android:layout_width="40dp" android:layout_height="40dp" android:background="#00BCD4" android:layout_margin="8dp"/>
+                        <View android:id="@+id/colorPink" android:layout_width="40dp" android:layout_height="40dp" android:background="#E91E63" android:layout_margin="8dp"/>
+                        <View android:id="@+id/colorNeonGreen" android:layout_width="40dp" android:layout_height="40dp" android:background="#39FF14" android:layout_margin="8dp"/>
+                        <View android:id="@+id/colorOrange" android:layout_width="40dp" android:layout_height="40dp" android:background="#FF5722" android:layout_margin="8dp"/>
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
