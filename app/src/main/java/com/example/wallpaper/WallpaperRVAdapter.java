@@ -17,11 +17,11 @@ import java.util.ArrayList;
 
 public class WallpaperRVAdapter extends RecyclerView.Adapter<WallpaperRVAdapter.ViewHolder> {
 
-    private ArrayList<String> wallapaperRVArrayList;
+    private ArrayList<WallpaperModel> wallpaperArrayList;
     private Context context;
 
-    public WallpaperRVAdapter(ArrayList<String> wallapaperRVArrayList, Context context) {
-        this.wallapaperRVArrayList = wallapaperRVArrayList;
+    public WallpaperRVAdapter(ArrayList<WallpaperModel> wallpaperArrayList, Context context) {
+        this.wallpaperArrayList = wallpaperArrayList;
         this.context = context;
     }
 
@@ -29,17 +29,30 @@ public class WallpaperRVAdapter extends RecyclerView.Adapter<WallpaperRVAdapter.
     @Override
     public WallpaperRVAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.wallpaper_rv_item, parent, false);
-        return new WallpaperRVAdapter.ViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull WallpaperRVAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        Glide.with(context).load(wallapaperRVArrayList.get(position)).into(holder.wallpaperIV);
+    public void onBindViewHolder(@NonNull WallpaperRVAdapter.ViewHolder holder,
+            @SuppressLint("RecyclerView") int position) {
+        WallpaperModel model = wallpaperArrayList.get(position);
+        Glide.with(context).load(model.getImageUrl()).into(holder.wallpaperIV);
+
+        if (model.isVideo()) {
+            holder.videoBadge.setVisibility(View.VISIBLE);
+        } else {
+            holder.videoBadge.setVisibility(View.GONE);
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(context, WallpaerActivity.class);
-                i.putExtra("imageUrl", wallapaperRVArrayList.get(position));
+                i.putExtra("imageUrl", model.getImageUrl());
+                i.putExtra("isVideo", model.isVideo());
+                if (model.isVideo()) {
+                    i.putExtra("videoUrl", model.getVideoUrl());
+                }
                 context.startActivity(i);
             }
         });
@@ -47,15 +60,17 @@ public class WallpaperRVAdapter extends RecyclerView.Adapter<WallpaperRVAdapter.
 
     @Override
     public int getItemCount() {
-        return wallapaperRVArrayList.size();
+        return wallpaperArrayList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView wallpaperIV;
+        ImageView videoBadge;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             wallpaperIV = itemView.findViewById(R.id.idIVWallpaper);
+            videoBadge = itemView.findViewById(R.id.idIVVideoBadge);
         }
     }
 }
